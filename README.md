@@ -81,7 +81,10 @@ Telegram: Use a API do Telegram para criar um bot.
 Site: Use Flask ou Django para criar uma interface web.
 
 Exemplo de Uso:
+
 ![image](https://github.com/user-attachments/assets/51b8e063-14fd-48ce-92a9-f0626aceeb70)
+![image](https://github.com/user-attachments/assets/4bd73be5-b27b-4004-8efe-91040dca6186)
+
 
 
 
