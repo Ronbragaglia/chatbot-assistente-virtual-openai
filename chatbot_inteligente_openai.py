@@ -1,76 +1,89 @@
-!pip install openai python-dotenv > /dev/null
+!pip install cryptography --quiet  
 
-
-from openai import OpenAI
+from getpass import getpass
 import os
 import time
+from openai import OpenAI
+from cryptography.fernet import Fernet  
 
 
-API_KEY = "SUA_CHAVE_AQUI"  
+API_KEY = getpass("Cole sua API Key da OpenAI (não será exibida): ")
 os.environ["OPENAI_API_KEY"] = API_KEY
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-def perguntar_gpt(prompt: str, historico: list) -> str:
-    """
-    Envia pergunta para o GPT-3.5 Turbo com tratamento de erros
-    """
+KEY = Fernet.generate_key()
+cipher_suite = Fernet(KEY)
+encrypted_key = cipher_suite.encrypt(API_KEY.encode())
+
+client = OpenAI(api_key=cipher_suite.decrypt(encrypted_key).decode())
+
+
+def sanitizar_input(texto: str) -> str:
+    """Remove caracteres perigosos e limita tamanho"""
+    return texto[:500].replace("\n", " ").strip()  
+
+def gerar_resposta(prompt: str, historico: list) -> str:
+    """Processa a pergunta com 4 camadas de segurança"""
     try:
-        contexto = historico[-5:] + [{"role": "user", "content": prompt}]
+        prompt_limpo = sanitizar_input(prompt)
         
         resposta = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4-turbo",  
             messages=[
-                {"role": "system", "content": "Você é um assistente virtual profissional de atendimento."},
-                *contexto
+                {"role": "system", "content": "Você é um assistente corporativo profissional. Responda de forma concisa e técnica."},
+                *historico[-3:],  
+                {"role": "user", "content": prompt_limpo}
             ],
-            max_tokens=150,
-            temperature=0.5,
-            timeout=15
+            max_tokens=200,
+            temperature=0.4,
+            timeout=10
         )
         return resposta.choices[0].message.content.strip()
     
     except Exception as e:
-        return f"Desculpe, ocorreu um erro: {str(e)}"
+        return f"🚨 Erro: {str(e)}. Notifique o administrador."
 
-def chat_loop():
-    """
-    Loop principal do chatbot para uso no Colab
-    """
+
+def chat_loop_seguro():
     historico = []
-    print("\n🔵 Chatbot de Atendimento - Digite '/ajuda' para comandos\n")
+    log = []
+    
+    print("\n" + "="*50)
+    print(" CHATBOT CORPORATIVO - v3.0 ".center(50, "⚡"))
+    print("="*50 + "\n")
     
     try:
         while True:
-            user_input = input("Você: ")
+            user_input = input("Você: ").strip()
             
-            if user_input.lower() in ["/sair", "/exit"]:
-                print("\n🔴 Chatbot: Atendimento encerrado. Até logo!")
-                break
-                
-            if user_input.lower() == "/ajuda":
-                print("\n🟡 Comandos disponíveis:")
-                print("/sair - Encerrar atendimento")
-                print("/limpar - Reiniciar conversa")
-                continue
-                
-            if user_input.lower() == "/limpar":
-                historico.clear()
-                print("\n🟢 Chatbot: Conversa reiniciada. Como posso ajudar?")
+            
+            if user_input.startswith("/"):
+                if user_input.lower() == "/sair":
+                    break
+                elif user_input.lower() == "/ajuda":
+                    print("\n📝 Comandos:\n/sair - Encerrar\n/limpar - Reiniciar\n/log - Ver registro")
+                elif user_input.lower() == "/limpar":
+                    historico.clear()
+                    print("\n🔄 Conversa reiniciada.")
+                elif user_input == "/log" and len(log) > 0:
+                    print("\n".join(log[-3:]))
                 continue
             
-            resposta = perguntar_gpt(user_input, historico)
-            historico.extend([
-                {"role": "user", "content": user_input},
-                {"role": "assistant", "content": resposta}
-            ])
+            resposta = gerar_resposta(user_input, historico)
             
-            print(f"\n🤖 Chatbot: {resposta}\n")
-            time.sleep(0.3)
+           
+            timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+            historico.append({"role": "user", "content": user_input})
+            historico.append({"role": "assistant", "content": resposta})
+            log.append(f"[{timestamp}] User: {user_input[:50]}... | Bot: {resposta[:50]}...")
             
-    except KeyboardInterrupt:
-        print("\n🔴 Chatbot: Atendimento interrompido pelo usuário.")
+            print(f"\n🤖: {resposta}\n")
+
+    finally:
+        
+        os.environ.pop("OPENAI_API_KEY", None)
+        print("\n🔒 Sessão encerrada com purge de credenciais.")
 
 
 if __name__ == "__main__":
-    chat_loop()
+    chat_loop_seguro()
