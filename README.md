@@ -12,28 +12,27 @@ Ser integrado a diversos canais de comunicação, como WhatsApp, Telegram ou sit
 
 Ser facilmente personalizado para atender às necessidades específicas da sua empresa.
 
-Funcionalidades
+FUNCIONALIDADES:
 Respostas Contextuais:
 
 O chatbot usa o histórico das últimas interações para gerar respostas mais precisas e relevantes.
 
-Comandos Especiais:
+COMANDOS ESPECIAIS:
 
 Inclui comandos como /ajuda para orientar os usuários sobre como interagir com o bot.
 
-Integração com APIs:
+INTEGRAÇÃO COM APIS:
 
 Pode ser integrado a APIs de serviços como WhatsApp, Telegram ou sistemas internos da empresa.
 
-Personalização:
-
+PERSONALIZAÇÃO:
 Fácil adaptação para incluir perguntas e respostas específicas da empresa.
 
-Controle de Cota:
+CONTROLE DE COTA:
 
 Inclui um intervalo de 1 segundo entre as requisições para evitar exceder os limites de cota da API da OpenAI.
 
-Tecnologias Usadas
+TECNOLOGIAS USADAS:
 Python: Linguagem de programação principal.
 
 OpenAI API: Utilizada para acessar o modelo GPT-3.5 Turbo e gerar respostas inteligentes.
@@ -48,14 +47,14 @@ Twilio (opcional): Para integração com WhatsApp ou SMS.
 
 Telegram API (opcional): Para integração com o Telegram.
 
-Como Funciona
+COMO FUNCIONA?
 Interação com o Usuário:
 
 O usuário faz uma pergunta ou comando.
 
 O chatbot processa a pergunta usando o modelo GPT-3.5 Turbo e gera uma resposta.
 
-Histórico de Conversas:
+HISTÓRICO DE CONVERSAS:
 
 O chatbot mantém um histórico das últimas 5 interações para gerar respostas contextuais.
 
@@ -67,7 +66,7 @@ Integração com Canais de Comunicação:
 
 O chatbot pode ser integrado a WhatsApp, Telegram, sites ou outros sistemas via APIs.
 
-Como Usar
+COMO USAR?
 Pré-requisitos
 Python 3.7 ou superior.
 
